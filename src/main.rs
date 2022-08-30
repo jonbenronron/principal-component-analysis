@@ -2,12 +2,15 @@ use std::ops::Div;
 use std::iter::Sum;
 use num_traits::cast::AsPrimitive;
 
+type TMatrix = Vec<Vec<f32>>;
+
 fn main() {
-    let x: Vec<f32> = vec![1., 2., 3.];
-    let y: Vec<f32> = vec![2., 3., 4.];
-    println!("Mean of X: {:?}", mean::<f32, f32>(&x));
-    println!("Mean of Y: {:?}", mean::<f32, f32>(&y));
-    println!("Covariance of X and Y: {:?}", covariance(&x, &y))
+    let x: TMatrix = vec![
+        vec![1., 2., 3., 4.],
+        vec![3., 4., 5., 6.],
+        vec![7., 8., 9., 1.],
+    ];
+    println!("Covariance matrix for data {:#?}: {:#?}", &x, covariance_matrix(&x));
 }
 
 fn covariance(x: &Vec<f32>, y: &Vec<f32>) -> f32 {
@@ -48,4 +51,23 @@ fn dot(x: &Vec<f32>, y: &Vec<f32>) -> Vec<f32> {
     }
 
     z
+}
+
+fn covariance_matrix (x: &TMatrix) -> TMatrix {
+    assert!(!x.is_empty(), "Matrix can't be empty!");
+    for (i, v) in x.iter().enumerate() {
+        assert!(!v.is_empty(), "Row vector {} of matrix can't be empty!", i);
+    }
+
+    let mut c: TMatrix = Vec::new();
+
+    for u in x {
+        let mut d: Vec<f32> = Vec::new();
+        for v in x {
+            d.push(covariance(u, v));
+        }
+        c.push(d);
+    }
+
+    c
 }
